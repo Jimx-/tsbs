@@ -8,25 +8,19 @@ import (
 	"bufio"
 	"flag"
 	"log"
-	"time"
 
 	"github.com/timescale/tsbs/load"
 )
 
 // Program option vars:
 var (
-	daemonURLs        []string
-	dbPath string
-	replicationFactor int
-	backoff           time.Duration
-	useGzip           bool
-	doAbortOnExist    bool
-	consistency       string
+	dbPath         string
+	doAbortOnExist bool
 )
 
 // Global vars
 var (
-	loader  *load.BenchmarkRunner
+	loader *load.BenchmarkRunner
 )
 
 // allows for testing

@@ -1,21 +1,19 @@
-// bulk_load_influx loads an InfluxDB daemon with data from stdin.
+// tsbs_load_prometheus loads a Prometheus TSDB instance with data from stdin.
 //
-// The caller is responsible for assuring that the database is empty before
-// bulk load.
 package main
 
 import (
 	"bufio"
 	"flag"
 	"log"
+	"time"
 
 	"github.com/timescale/tsbs/load"
 )
 
 // Program option vars:
 var (
-	dbPath         string
-	doAbortOnExist bool
+	dbPath string
 )
 
 // Global vars
@@ -60,5 +58,6 @@ func (b *benchmark) GetDBCreator() load.DBCreator {
 func main() {
 	loader.RunBenchmark(&benchmark{}, load.SingleQueue)
 
+	time.Sleep(2 * time.Second) // wait for TSDB to finish compaction
 	tsdbStorage.Close()
 }

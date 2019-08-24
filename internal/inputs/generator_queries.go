@@ -16,6 +16,7 @@ import (
 	"github.com/timescale/tsbs/cmd/tsbs_generate_queries/databases/clickhouse"
 	"github.com/timescale/tsbs/cmd/tsbs_generate_queries/databases/influx"
 	"github.com/timescale/tsbs/cmd/tsbs_generate_queries/databases/mongo"
+	"github.com/timescale/tsbs/cmd/tsbs_generate_queries/databases/prometheus"
 	"github.com/timescale/tsbs/cmd/tsbs_generate_queries/databases/siridb"
 	"github.com/timescale/tsbs/cmd/tsbs_generate_queries/databases/timescaledb"
 	"github.com/timescale/tsbs/cmd/tsbs_generate_queries/utils"
@@ -203,6 +204,8 @@ func (g *QueryGenerator) getUseCaseGenerator(c *QueryGeneratorConfig) (utils.Que
 		temp.UseTags = c.TimescaleUseTags
 		temp.UseTimeBucket = c.TimescaleUseTimeBucket
 		ret = temp
+	case FormatPrometheus:
+		ret = prometheus.NewDevops(g.tsStart, g.tsEnd, scale)
 	default:
 		return nil, fmt.Errorf(errUnknownFormatFmt, c.Format)
 	}

@@ -3,6 +3,7 @@ package main
 // This file lifted wholesale from mountainflux by Mark Rushakoff.
 
 import (
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -37,8 +38,8 @@ func (w *DBWriter) Write(points []string) (int64, error) {
 
 		args := strings.Split(point, " ")
 
-		tags := strings.Split(args[0], ",")
-		for _, tag := range tags[1:] {
+		tags := strings.Split("__name__="+args[0], ",")
+		for _, tag := range tags {
 			ss := strings.Split(tag, "=")
 			labs = append(labs, labels.Label{Name: ss[0], Value: ss[1]})
 		}
@@ -49,9 +50,10 @@ func (w *DBWriter) Write(points []string) (int64, error) {
 		for _, metric := range metrics {
 			ss := strings.Split(metric, "=")
 			metric_name := ss[0]
-			metric_labs := make([]labels.Label, len(labs))
+			metric_labs := make(labels.Labels, len(labs))
 			copy(metric_labs, labs)
-			metric_labs = append(metric_labs, labels.Label{Name: "__name__", Value: metric_name})
+			metric_labs = append(metric_labs, labels.Label{Name: "__metric__", Value: metric_name})
+			sort.Sort(metric_labs)
 
 			value, _ := strconv.Atoi(ss[1][:len(ss[1])-1])
 

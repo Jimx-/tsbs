@@ -66,13 +66,18 @@ func (d *Devops) getHostLabelString(nHosts int) string {
 // max(max_over_time(cpu{__metric=~"metric1|metric2|...|metricN", hostname=~"hostname1|...|hostnameN"}[1m])) by (hostname)
 func (d *Devops) GroupByTime(qi query.Query, nHosts, numMetrics int, timeRange time.Duration) {
 	interval := d.Interval.MustRandWindow(timeRange)
-	metrics, err := devops.GetCPUMetricsSlice(numMetrics)
-	panicIfErr(err)
+	// metrics, err := devops.GetCPUMetricsSlice(numMetrics)
+	// panicIfErr(err)
 
 	humanLabel := fmt.Sprintf("Prometheus %d cpu metric(s), random %4d hosts, random %s by 1m", numMetrics, nHosts, timeRange)
 	humanDesc := fmt.Sprintf("%s: %s", humanLabel, interval.StartString())
-	promql := fmt.Sprintf("max(max_over_time(cpu{%s, __metric__%s}[1m])) by (__metric__)", d.getHostLabelString(nHosts), d.getPredicateWithValues(metrics))
-	d.fillInRangeQuery(qi, humanLabel, humanDesc, promql, interval.StartUnixMillis(), interval.EndUnixMillis(), 60)
+	// promql := fmt.Sprintf("max(max_over_time(cpu{%s, __metric__%s}[1m])) by (__metric__)", d.getHostLabelString(nHosts), d.getPredicateWithValues(metrics))
+	// promql := fmt.Sprintf("cpu{%s, __metric__%s}", d.getHostLabelString(nHosts), d.getPredicateWithValues(metrics))
+	promql := "cpu{__metric__!=\"usage_user\", hostname=~\"host_1...$\"}"
+
+	// d.fillInRangeQuery(qi, humanLabel, humanDesc, promql, interval.StartUnixMillis(), interval.EndUnixMillis(), 60)
+	d.fillInRangeQuery(qi, humanLabel, humanDesc, promql, d.Interval.StartUnixMillis(), d.Interval.EndUnixMillis(), 60*60)
+
 }
 
 // GroupByOrderByLimit benchmarks a query that has a time WHERE clause, that groups by a truncated date, orders by that date, and takes a limit:
